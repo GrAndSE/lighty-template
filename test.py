@@ -2,15 +2,15 @@ base = """<!DOCTYPE html>
 <html>
 <head>
   <title>{{ title }}</title>
-  {% block head %}{% endblock %}
+  <% block head %></% block %>
 </head>
 <body>
-  {% block content %}{% endbock %}
+  <% block content %></% block %>
 </body>
 </html>"""
-extended = """{% extend "base.html" %}
-{% block head %}<style></style>{% endblock %}
-{% block content %}<h1>Hello, world!</h1>{% endblock %}"""
+extended = """<% extend "base.html" %/>
+<% block head %><style></style><% endblock %>
+<% block content %><h1>Hello, world!</h1></% endblock %>"""
 
 
 from lighty.templates import Template
