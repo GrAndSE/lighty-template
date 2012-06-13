@@ -315,10 +315,8 @@ class Forloop:
 
     def next(self, context):
         self.counter0 = 0
-        for v in self.values:
-            context[self.var_name] = v
+        for self.counter0, context[self.var_name] in enumerate(self.values):
             yield exec_block(self.block, context)
-            self.counter0 += 1
 
     def __call__(self, context):
         return "".join([next for next in self.next(context)])

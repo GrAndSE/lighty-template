@@ -119,15 +119,15 @@ class Template(object):
                                             context)
             if variable[0] == '"' or variable[0] == "'":
                 if variable[0] == variable[-1]:
-                    value_with_filters = [variable[1:-1]] + filters
+                    value = variable[1:-1]
                 else:
                     raise Exception('Template filter syntax error')
             else:
                 try:
-                    value_with_filters = [Decimal(variable)] + filters
+                    value = Decimal(variable)
                 except:
-                    value_with_filters = [resolve(variable, context)] + filters
-            return str(reduce(apply_filter, value_with_filters))
+                    value = resolve(variable, context)
+            return str(reduce(apply_filter, filters, value))
         return apply_filters
 
     def tag(self, name, token, block):

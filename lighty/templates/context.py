@@ -3,10 +3,6 @@
 from functools import reduce
 
 
-def get_value(var_name, context):
-    return context[var_name] if var_name in context else None
-
-
 def get_field(obj, field):
     if hasattr(obj, field):
         return getattr(obj, field)
@@ -18,5 +14,5 @@ def get_field(obj, field):
 def resolve(var_name, context):
     if '.' in var_name:
         fields = var_name.split('.')
-        return reduce(get_field, [get_value(fields[0], context)] + fields[1:])
-    return get_value(var_name, context)
+        return reduce(get_field, fields[1:], context.get(fields[0], None))
+    return context.get(var_name, None)
