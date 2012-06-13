@@ -1,6 +1,15 @@
 Lighty-Template Changelog
 =========================
 
+Version 0.3.4
+-------------
+(released on June 13th 2012)
+
+- Fix issue with block and extending related to render different templates.
+- Add date template filter.
+- A lots of documentation added.
+
+
 Version 0.3.3
 -------------
 (bug fix release on March 26th 2012)
