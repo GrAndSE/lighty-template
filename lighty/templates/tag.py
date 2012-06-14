@@ -1,20 +1,25 @@
 """Package provides template tags manager and base tags list
 """
+import re
+
 VARIABLE = 0
 STRING = 1
 NUMBER = 2
+SPACE = re.compile('[\\s]+')
 
 
 def parse_token(token):
+    '''Parse a token passed to tag
+    '''
     tokens = []
     token_types = []
     delim = None
     sentence = None
-    for word in [word for word in token.split(' ') if len(word) > 0]:
+    for word in [word for word in SPACE.split(token)]:
         if delim is None:
-            idx = word.find('"')
-            if idx < 0:
-                idx = word.find("'")
+            idx = (word.find('"') if '"' in word
+                   else word.find("'") if "'" in word
+                   else -1)
             if idx >= 0:
                 delim = word[idx]
                 if idx > 0:
@@ -35,22 +40,20 @@ def parse_token(token):
                 tokens.append(word)
                 try:
                     float(word)
-                except:
-                    token_types.append(VARIABLE)
-                else:
                     token_types.append(NUMBER)
-        else:
-            if delim in word:
-                parts = word.split(delim)
-                sentence.append(parts[0])
-                tokens.append(" ".join(sentence))
+                except ValueError:
+                    token_types.append(VARIABLE)
+        elif delim in word:
+            parts = word.split(delim)
+            sentence.append(parts[0])
+            tokens.append(" ".join(sentence))
+            token_types.append(STRING)
+            if len(parts) > 1 and len(parts[1]) > 0:
                 token_types.append(STRING)
-                if len(parts) > 1 and len(parts[1]) > 0:
-                    token_types.append(STRING)
-                    tokens.append(parts[1])
-                delim = None
-            else:
-                sentence.append(word)
+                tokens.append(parts[1])
+            delim = None
+        else:
+            sentence.append(word)
     return tokens, token_types
 
 
@@ -82,7 +85,7 @@ class TagManager(object):
         """Check is tag exists
         """
         if name not in self.tags:
-            raise Exception("Tag '%s' is not registered" % name)
+            raise LookupError("Tag '%s' is not registered" % name)
         return self.tags[name]
 
     def is_block_tag(self, name):
@@ -97,13 +100,13 @@ class TagManager(object):
         """
         return self.is_tag_exists(name)[5]
 
-    def execute(self, name, token, context, block, template, loader):
+    def execute(self, name, token, context, block_contents, template, loader):
         """Execute tag
         """
         tag = self.is_tag_exists(name)
         args = {'token': token}
         if tag[1]:
-            args['block'] = block
+            args['block_contents'] = block_contents
         if tag[2]:
             args['context'] = context
         if tag[3]:

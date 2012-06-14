@@ -18,7 +18,7 @@ class DefaultFiltersTestCase(unittest.TestCase):
 
     def testSum(self):
         '''Test sum template filter'''
-        result = templatefilters.sum(1, 2, 3, 4)
+        result = templatefilters.summ(1, 2, 3, 4)
         self.assertResult('sum', result, 10)
 
     def testFloatFormat(self):

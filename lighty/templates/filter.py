@@ -25,10 +25,10 @@ class FilterManager(object):
         '''
         self.filters[filter.__name__] = filter
 
-    def apply(self, filter, value, args, arg_types, context):
+    def apply(self, filter_name, value, args, arg_types, context):
         '''Apply filter to values
         '''
-        filter_func = self.is_filter_exists(filter)
+        filter_func = self.is_filter_exists(filter_name)
         new_args = []
         i = 0
         while i < len(args):

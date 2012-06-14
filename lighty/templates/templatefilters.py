@@ -1,7 +1,7 @@
 '''Package contains default template tags
 '''
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
-from functools import reduce
+import functools
 from operator import itemgetter
 import random as random_module
 
@@ -10,28 +10,31 @@ from .filter import filter_manager
 # Numbers
 
 
-def sum(*args):
+def summ(*args):
     '''Calculate the sum of all the values passed as args and
     '''
-    return reduce(lambda x, y: x + float(y), args)
-filter_manager.register(sum)
+    return functools.reduce(lambda x, y: x + float(y), args)
+filter_manager.register(summ)
 
 
-def float_format_args_parse(func, raw_value, format):
-    # Parse arguments
+def float_format_args_parse(func, raw_value, format_string):
+    '''Parse arguments for float formating
+    '''
     try:
-        digits = abs(int(format))
-    except:
-        raise Exception('%s arguments error: format is not integer' % func)
+        digits = abs(int(format_string))
+    except ValueError:
+        raise Exception('%s arguments error: format_string is not integer' %
+                        func)
     try:
         value = Decimal(raw_value)
-    except:
+    except ValueError:
         raise Exception('%s supports only number values' % func)
     return value, digits
 
 
 def do_float_format(value, digits, rounding):
-    # Make formater
+    '''Get a float value with specified number of digits accoring to rounding
+    '''
     digit = 0
     formatter = Decimal('1')
     while digit < digits:
@@ -40,7 +43,7 @@ def do_float_format(value, digits, rounding):
     return value.quantize(formatter, rounding=rounding)
 
 
-def floatformat(raw_value, format='0'):
+def floatformat(raw_value, format_string='0'):
     '''Make pretty float representation
 
     Lets:
@@ -53,16 +56,15 @@ def floatformat(raw_value, format='0'):
         >>> print floatformat(a, '-2')
         12.4
     '''
-    value, digits = float_format_args_parse('floatformat', raw_value, format)
+    value, digits = float_format_args_parse('floatformat', raw_value,
+                                            format_string)
     result = do_float_format(value.copy_abs(), digits, ROUND_DOWN)
     result = str(result.copy_sign(value))
-    if format[0] == '-':
-        return result.rstrip('0')
-    return result
+    return result.rstrip('0') if format_string[0] == '-' else result
 filter_manager.register(floatformat)
 
 
-def floatround(raw_value, format="0"):
+def floatround(raw_value, format_string="0"):
     '''Round a float value according to math rules
 
     Lets:
@@ -73,7 +75,8 @@ def floatround(raw_value, format="0"):
         >>> print floatround(a, '1')
         12.5
     '''
-    value, digits = float_format_args_parse('floatround', raw_value, format)
+    value, digits = float_format_args_parse('floatround', raw_value,
+                                            format_string)
     return do_float_format(value, digits, ROUND_HALF_UP)
 filter_manager.register(floatround)
 
@@ -94,7 +97,7 @@ def capfirst(value):
 filter_manager.register(capfirst)
 
 
-def stringformat(value, format):
+def stringformat(value, format_string):
     """Formats the variable according to the format, a string formatting
     specifier.
 
@@ -104,7 +107,7 @@ def stringformat(value, format):
     See http://docs.python.org/lib/typesseq-strings.html for documentation
     of Python string formatting
     """
-    return ("%" + str(format)) % value
+    return ("%" + str(format_string)) % value
 filter_manager.register(stringformat)
 
 
@@ -184,8 +187,8 @@ filter_manager.register(sort)
 # Date and time
 
 
-def date(value, format):
+def date(value, format_string):
     '''Convert date into python format
     '''
-    return value.strftime(format)
+    return value.strftime(format_string)
 filter_manager.register(date)

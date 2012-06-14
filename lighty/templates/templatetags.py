@@ -10,9 +10,13 @@ from .tag import tag_manager, parse_token
 from .template import LazyTemplate, Template
 
 
-def exec_with_context(func, context={}, context_diff={}):
+def exec_with_context(func, context=None, context_diff=None):
     '''Execute function with context switching
     '''
+    if not context:
+        context = {}
+    if not context_diff:
+        context_diff = {}
     old_values = dict([(var_name,
                         context[var_name] if var_name in context else None)
                        for var_name in context_diff])
@@ -22,11 +26,11 @@ def exec_with_context(func, context={}, context_diff={}):
     return result
 
 
-def exec_block(block, context):
+def exec_block(block_contents, context):
     '''Helper function that can be used in block tags to execute inner template
     code on a specified context
     '''
-    return "".join([command(context) for command in block])
+    return "".join([command(context) for command in block_contents])
 
 
 def get_parent_blocks(template):
@@ -65,7 +69,7 @@ def replace_command(template, command, replacement):
         tmpl.commands[index] = replacement
 
 
-def block(token, block, template, loader):
+def block(token, block_contents, template, loader):
     """Block tag. This tag provides method to modify chilren template for
     template inheritance.
 
@@ -114,7 +118,7 @@ def block(token, block, template, loader):
     """
     # Create inner template for blocks
     tmpl = Template(name='blocks-' + token, loader=loader)
-    tmpl.commands = block
+    tmpl.commands = block_contents
 
     # Add template block into list
     if not hasattr(template, 'blocks'):
@@ -178,7 +182,7 @@ def include(token, context, loader):
             {% block content %}{% endblock %}
         </body>
     '''
-    tokens, types = parse_token(token)
+    tokens, _ = parse_token(token)
     template = loader.get_template(tokens[0])
     return exec_with_context(template, context, {})
 
@@ -193,7 +197,7 @@ tag_manager.register(
 )
 
 
-def spaceless(token, block, context):
+def spaceless(token, block_contents, context):
     """This tag removes unused spaces
 
     Template::
@@ -207,7 +211,7 @@ def spaceless(token, block, context):
 
         Some text
     """
-    results = [command(context).split('\n') for command in block]
+    results = [command(context).split('\n') for command in block_contents]
     return "".join([line.lstrip() for line in itertools.chain(*results)])
 
 tag_manager.register(
@@ -221,7 +225,7 @@ tag_manager.register(
 )
 
 
-def with_tag(token, block, context):
+def with_tag(token, block_contents, context):
     """With tag can be used to set the shorter name for variable used few times
 
     Example:
@@ -240,7 +244,7 @@ def with_tag(token, block, context):
     """
     data_field, _, var_name = token.split(' ')
     value = resolve(data_field, context)
-    return exec_with_context(partial(exec_block, block), context,
+    return exec_with_context(partial(exec_block, block_contents), context,
                              {var_name: value})
 
 tag_manager.register(
@@ -254,7 +258,7 @@ tag_manager.register(
 )
 
 
-def if_tag(token, block, context):
+def if_tag(token, block_contents, context):
     """If tag can brings some logic into template. Now it's has very simple
     implementations that only checks is variable equivalent of True. There is
     no way to add additional logic like comparisions or boolean expressions.
@@ -274,7 +278,7 @@ def if_tag(token, block, context):
         - add conditions
     """
     if resolve(token, context):
-        return exec_block(block, context)
+        return exec_block(block_contents, context)
     return ''
 
 tag_manager.register(
@@ -288,41 +292,49 @@ tag_manager.register(
 )
 
 
-class Forloop:
+class Forloop(object):
     '''Class for executing block in loop with a context update
     '''
 
-    def __init__(self, var_name, values, block):
+    def __init__(self, var_name, values, block_contents):
         self.var_name = var_name
         self.values = values
-        self.block = block
+        self.block = block_contents
+        self.counter0 = 0
 
     @property
     def total(self):
+        '''Get number of iterations
+        '''
         return len(self.values)
 
     @property
     def last(self):
+        '''Check is current iteration last iteration
+        '''
         return not self.counter0 < self.total
 
     @property
     def first(self):
+        '''Check is current iteration first iteration
+        '''
         return self.counter0 == 0
 
     @property
     def counter(self):
+        '''Get the number of current iteration iteration starting from 1
+        '''
         return self.counter0 + 1
 
-    def next(self, context):
-        self.counter0 = 0
-        for self.counter0, context[self.var_name] in enumerate(self.values):
-            yield exec_block(self.block, context)
-
     def __call__(self, context):
-        return "".join([next for next in self.next(context)])
+        '''Get all the iterations joined
+        '''
+        values = enumerate(self.values)
+        return "".join([exec_block(self.block, context)
+                        for self.counter0, context[self.var_name] in values])
 
 
-def for_tag(token, block, context):
+def for_tag(token, block_contents, context):
     """For tag used to make loops over all the iterator-like objects.
 
     Example::
@@ -362,7 +374,7 @@ def for_tag(token, block, context):
     if not isinstance(values, collections.Iterable):
         raise ValueError('%s: "%s" is not iterable' % (data_field, values))
     # execute inline forloop
-    forloop = Forloop(var_name, values, block)
+    forloop = Forloop(var_name, values, block_contents)
     return exec_with_context(forloop, context, {'forloop': forloop})
 
 tag_manager.register(

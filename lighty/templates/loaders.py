@@ -40,7 +40,7 @@ class FSLoader(TemplateLoader):
         from .template import LazyTemplate
         super(FSLoader, self).__init__()
         for path in template_dirs:
-            for root, dirs, files in os.walk(path):
+            for root, _, files in os.walk(path):
                 if root.startswith(path):
                     relative_path = root.replace(path, '')
                 else:
@@ -51,6 +51,6 @@ class FSLoader(TemplateLoader):
                 for file_name in files:
                     name = os.path.join(relative_path, file_name)
                     file_path = os.path.join(root, file_name)
-                    with open(file_path, 'r') as file:
-                        content = itertools.chain(*file.readlines())
+                    with open(file_path, 'r') as handle:
+                        content = itertools.chain(*handle.readlines())
                         LazyTemplate(content, name=name, loader=self)
