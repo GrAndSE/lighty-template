@@ -8,6 +8,7 @@ Version 0.3.4
 - Fix issue with block and extending related to render different templates.
 - Add date template filter.
 - A lots of documentation added.
+- Code clean up according to PEP8 standart and pylint recomendations.
 
 
 Version 0.3.3
