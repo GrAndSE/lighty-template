@@ -7,6 +7,5 @@ lighty/templates/context.py
 lighty/templates/filter.py
 lighty/templates/loaders.py
 lighty/templates/tag.py
-lighty/templates/template.py
 lighty/templates/templatefilters.py
 lighty/templates/templatetags.py
