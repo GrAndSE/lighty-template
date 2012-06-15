@@ -2,7 +2,7 @@
 """
 import unittest
 
-from lighty.templates import Template
+from templator import Template
 
 
 class VariableFieldTestCase(unittest.TestCase):

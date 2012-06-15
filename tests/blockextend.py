@@ -2,7 +2,7 @@
 """
 import unittest
 
-from lighty.templates import Template
+from templator import Template
 
 BASE = """<!DOCTYPE html>
 <html>

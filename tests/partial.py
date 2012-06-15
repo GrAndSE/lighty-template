@@ -2,7 +2,7 @@
 '''
 import unittest
 
-from lighty.templates import Template
+from templator import Template
 
 
 class PartialTestCase(unittest.TestCase):

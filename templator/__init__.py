@@ -67,9 +67,9 @@ exception. Lighty-template is strict template engine requires to be carefull
 with your templates and variables in context for rendering. I think that
 usually strict means better and safe.
 """
-from collections import deque
+import collections
 import functools
-from decimal import Decimal
+import decimal
 try:
     import cStringIO
     StringIO = cStringIO.StringIO
@@ -200,8 +200,8 @@ class Template(object):
                     raise ValueError('Template filter syntax error')
             else:
                 try:
-                    value = Decimal(variable)
-                except ValueError:
+                    value = decimal.Decimal(variable)
+                except decimal.InvalidOperation:
                     value = resolve(variable, context)
             return str(functools.reduce(apply_filter, filters, value))
         return apply_filters
@@ -231,9 +231,9 @@ class Template(object):
         current = Template.TEXT
         token = ''
         cmds = self.commands
-        cmd_stack = deque()
-        tag_stack = deque()
-        token_stack = deque()
+        cmd_stack = collections.deque()
+        tag_stack = collections.deque()
+        token_stack = collections.deque()
         for char in text:
             if current == Template.TEXT:
                 if char == '{':
@@ -409,7 +409,6 @@ class LazyTemplate(Template):
         '''Execute
         '''
         self.prepare()  # First call prepare
-        super(LazyTemplate, self).execute(context)
+        return super(LazyTemplate, self).execute(context)
 
-from .template import Template
 from . import templatefilters, templatetags

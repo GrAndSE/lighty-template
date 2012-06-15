@@ -3,10 +3,9 @@
 Lighty-template
 ~~~~~~~~~~~~~~~
 
-Lighty-template is very simple template engine for python (python.org).
-Template syntax looks like django-template or jinja2 template. But template
-engine code is easier and gives a way to write all needed tags without any
-hacks.
+Templator is very simple template engine for python (python.org). Template
+syntax looks like django-template or jinja2 template. But template engine code
+is easier and gives a way to write all needed tags without any hacks.
 
 Now it does not include all features django-template or jinja2 supports, but
 I'll try to fix it as soon as possible.
@@ -48,6 +47,14 @@ Here a small template example:
     </body>
     </html>
 
+History:
+--------
+Prevoisly called lighty-templates and was a part of the lighty web-framework 
+(http://pypi.python.org/pypi/lighty). But it has been moved from lighty to
+make lighty more flexible and renamed from lighty-template to templator to
+prevent package names and make possible to use it as standalone template
+engine without a problems.
+
 TODO:
 -----
 
@@ -62,8 +69,8 @@ TODO:
 from distutils.core import setup
 
 setup(
-        name='lighty-template',
-        version='0.3.4',
+        name='templator',
+        version='0.4',
         description='Simple template engine for python',
         long_description=__doc__,
         keywords='Template HTML XML',
@@ -71,7 +78,7 @@ setup(
         author_email='undeadgrandse@gmail.com',
         license='BSD',
         url='https://github.com/GrAndSE/lighty-template',
-        packages=['lighty', 'lighty.templates'],
+        packages=['templator'],
         platforms="any",
         classifiers=[
             'Development Status :: 4 - Beta',

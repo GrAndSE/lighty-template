@@ -2,8 +2,8 @@
 """
 import unittest
 
-from lighty.templates import Template
-from lighty.templates.filter import filter_manager
+from templator import Template
+from templator.filter import filter_manager
 
 
 def simple_filter(value):

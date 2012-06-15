@@ -2,7 +2,7 @@
 
 import unittest
 
-from lighty.templates.tag import parse_token, VARIABLE, STRING, NUMBER
+from templator.tag import parse_token, VARIABLE, STRING, NUMBER
 
 
 class ParseTokenTestCase(unittest.TestCase):

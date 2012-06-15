@@ -2,8 +2,8 @@
 '''
 import unittest
 
-from lighty.templates import Template
-from lighty.templates.loaders import FSLoader
+from templator import Template
+from templator.loaders import FSLoader
 
 
 class DefaultTagsTestCase(unittest.TestCase):

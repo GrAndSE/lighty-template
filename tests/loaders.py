@@ -2,7 +2,7 @@
 """
 import unittest
 
-from lighty.templates.loaders import FSLoader
+from templator.loaders import FSLoader
 
 from .blockextend import fuzzy_equals
 

@@ -3,7 +3,7 @@
 import unittest
 from decimal import Decimal
 
-from lighty.templates import templatefilters
+from templator import templatefilters
 
 
 class DefaultFiltersTestCase(unittest.TestCase):

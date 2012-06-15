@@ -5,9 +5,9 @@ import copy
 from functools import partial
 import itertools
 
+from . import LazyTemplate, Template
 from .context import resolve
 from .tag import tag_manager, parse_token
-from .template import LazyTemplate, Template
 
 
 def exec_with_context(func, context=None, context_diff=None):
