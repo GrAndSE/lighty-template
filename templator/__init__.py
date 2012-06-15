@@ -84,7 +84,7 @@ except:
 
 from .context import resolve
 from .loaders import TemplateLoader
-from .filter import FilterManager
+from .filters import FilterManager
 from .tag import tag_manager, parse_token
 
 
@@ -137,6 +137,7 @@ class Template(object):
         self.name = name
         self.commands = []
         self.context = {}
+        self.filter_manager = FilterManager()
         self.loader.register(name, self)
         if text is not None:
             self.parse(text)
@@ -165,7 +166,7 @@ class Template(object):
         return print_constant
 
     @staticmethod
-    def filter(value):
+    def filter(value, filter_manager):
         '''Parse the tamplte filter
         '''
         parts = value.split('|')
@@ -192,8 +193,8 @@ class Template(object):
                 '''Apply signle filter to value specified
                 '''
                 filter_name, args, types = pair
-                return FilterManager.apply(filter_name, value, args, types,
-                                           context)
+                return filter_manager.apply(filter_name, value, args, types,
+                                            context)
             if variable[0] == '"' or variable[0] == "'":
                 if variable[0] == variable[-1]:
                     value = variable[1:-1]
@@ -259,7 +260,7 @@ class Template(object):
                         if current == Template.ECHO:
                             cmd = Template.variable(token)
                         else:
-                            cmd = Template.filter(token)
+                            cmd = Template.filter(token, self.filter_manager)
                         cmds.append(cmd)
                         token = ''
                     current = Template.CLOSE
@@ -324,13 +325,11 @@ class Template(object):
         Returns:
             string contains the whole result
         """
-        FilterManager.create_manager()
         result = StringIO()
         for cmd in self.commands:
             result.write(cmd(context or {}))
         value = result.getvalue()
         result.close()
-        FilterManager.destroy_manager()
         return value
 
     def __call__(self, context=None):
@@ -414,5 +413,5 @@ class LazyTemplate(Template):
         self.prepare()  # First call prepare
         return super(LazyTemplate, self).execute(context)
 
-importlib.import_module('templator.templatefilters')
+FilterManager.default.load('templator.templatefilters')
 importlib.import_module('templator.templatetags')

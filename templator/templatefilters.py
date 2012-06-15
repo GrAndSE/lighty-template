@@ -5,7 +5,7 @@ import functools
 from operator import itemgetter
 import random as random_module
 
-from .filter import FilterManager as filter_manager
+from . import filters
 
 # Numbers
 
@@ -14,7 +14,7 @@ def summ(*args):
     '''Calculate the sum of all the values passed as args and
     '''
     return functools.reduce(lambda x, y: x + float(y), args)
-filter_manager.register(summ)
+filters.register(summ)
 
 
 def float_format_args_parse(func, raw_value, format_string):
@@ -61,7 +61,7 @@ def floatformat(raw_value, format_string='0'):
     result = do_float_format(value.copy_abs(), digits, ROUND_DOWN)
     result = str(result.copy_sign(value))
     return result.rstrip('0') if format_string[0] == '-' else result
-filter_manager.register(floatformat)
+filters.register(floatformat)
 
 
 def floatround(raw_value, format_string="0"):
@@ -78,7 +78,7 @@ def floatround(raw_value, format_string="0"):
     value, digits = float_format_args_parse('floatround', raw_value,
                                             format_string)
     return do_float_format(value, digits, ROUND_HALF_UP)
-filter_manager.register(floatround)
+filters.register(floatround)
 
 # Strings
 
@@ -87,14 +87,14 @@ def addslashes(value):
     '''Add a slashes to string
     '''
     return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
-filter_manager.register(addslashes)
+filters.register(addslashes)
 
 
 def capfirst(value):
     '''Capitalizes the first character in string
     '''
     return value and value[0].upper() + value[1:]
-filter_manager.register(capfirst)
+filters.register(capfirst)
 
 
 def stringformat(value, format_string):
@@ -108,7 +108,7 @@ def stringformat(value, format_string):
     of Python string formatting
     """
     return ("%" + str(format_string)) % value
-filter_manager.register(stringformat)
+filters.register(stringformat)
 
 
 def upper(value):
@@ -129,7 +129,7 @@ def dictsort(value, key, order=''):
     '''Sort dict
     '''
     return sorted(value, key=itemgetter(key), reverse=(order != ''))
-filter_manager.register(dictsort)
+filters.register(dictsort)
 
 
 def get(value, index):
@@ -138,14 +138,14 @@ def get(value, index):
     if issubclass(value.__class__, dict):
         return value[sorted(value.keys())[index]]
     return value[index]
-filter_manager.register(get)
+filters.register(get)
 
 
 def first(value):
     '''Get first item from list
     '''
     return get(value, 0)
-filter_manager.register(first)
+filters.register(first)
 
 
 def join(value, joiner):
@@ -155,14 +155,14 @@ def join(value, joiner):
     '1 2 3'
     '''
     return joiner.join([str(item) for item in value])
-filter_manager.register(join)
+filters.register(join)
 
 
 def last(value):
     '''Get last item from list
     '''
     return get(value, len(value) - 1)
-filter_manager.register(last)
+filters.register(last)
 
 
 def length(value):
@@ -175,14 +175,14 @@ def random(value):
     '''Get random item from list or dict
     '''
     return get(value, random_module.random(len(value)))
-filter_manager.register(random)
+filters.register(random)
 
 
 def sort(value, order=''):
     '''Sort list
     '''
     return sorted(value, reverse=(order != ''))
-filter_manager.register(sort)
+filters.register(sort)
 
 # Date and time
 
@@ -191,4 +191,4 @@ def date(value, format_string):
     '''Convert date into python format
     '''
     return value.strftime(format_string)
-filter_manager.register(date)
+filters.register(date)

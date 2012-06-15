@@ -2,23 +2,24 @@
 """
 import unittest
 
-from templator import Template
-from templator.filter import FilterManager as filter_manager
+from templator import filters, Template
 
 
 def simple_filter(value):
     return str(value).upper()
-filter_manager.register(simple_filter)
+filters.register(simple_filter)
 
 
 def argument_filter(value, arg):
     return str(value) + ', ' + str(arg)
-filter_manager.register(argument_filter)
+filters.register(argument_filter)
 
 
 def multiarg_filter(value, *args):
     return ', '.join([str(arg) for arg in (value, ) + args])
-filter_manager.register(multiarg_filter)
+filters.register(multiarg_filter)
+
+filters.FilterManager.default.load('tests.filters')
 
 
 class TemplateFiltersTestCase(unittest.TestCase):
