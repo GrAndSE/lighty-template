@@ -3,7 +3,7 @@
 import unittest
 
 from templator import Template
-from templator.filter import filter_manager
+from templator.filter import FilterManager as filter_manager
 
 
 def simple_filter(value):

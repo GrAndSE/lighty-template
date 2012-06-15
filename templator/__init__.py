@@ -70,6 +70,7 @@ usually strict means better and safe.
 import collections
 import functools
 import decimal
+import importlib
 try:
     import cStringIO
     StringIO = cStringIO.StringIO
@@ -83,7 +84,7 @@ except:
 
 from .context import resolve
 from .loaders import TemplateLoader
-from .filter import filter_manager
+from .filter import FilterManager
 from .tag import tag_manager, parse_token
 
 
@@ -191,8 +192,8 @@ class Template(object):
                 '''Apply signle filter to value specified
                 '''
                 filter_name, args, types = pair
-                return filter_manager.apply(filter_name, value, args, types,
-                                            context)
+                return FilterManager.apply(filter_name, value, args, types,
+                                           context)
             if variable[0] == '"' or variable[0] == "'":
                 if variable[0] == variable[-1]:
                     value = variable[1:-1]
@@ -323,17 +324,19 @@ class Template(object):
         Returns:
             string contains the whole result
         """
+        FilterManager.create_manager()
         result = StringIO()
         for cmd in self.commands:
             result.write(cmd(context or {}))
         value = result.getvalue()
         result.close()
+        FilterManager.destroy_manager()
         return value
 
     def __call__(self, context=None):
         """Alias for execute()
         """
-        return self.execute(context or {})
+        return self.execute(context)
 
     def partial(self, context, name=''):
         """Execute all commands on a specified context and cache the result as
@@ -411,4 +414,5 @@ class LazyTemplate(Template):
         self.prepare()  # First call prepare
         return super(LazyTemplate, self).execute(context)
 
-from . import templatefilters, templatetags
+importlib.import_module('templator.templatefilters')
+importlib.import_module('templator.templatetags')

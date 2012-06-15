@@ -5,7 +5,7 @@ import functools
 from operator import itemgetter
 import random as random_module
 
-from .filter import filter_manager
+from .filter import FilterManager as filter_manager
 
 # Numbers
 
